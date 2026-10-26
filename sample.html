@@ -230,11 +230,11 @@
     <audio id="audio-player" crossorigin="anonymous"></audio>
 
     <script>
-                        const PLAYLIST = [
-            { id: 1, title: "Don't Be Dumb", artist: "ATEE", duration: "", cover: "/samples/covers/dont-be-dumb.jpg", color: "#00ff88", src: "/samples/Don't Be Dumb.m4a" },
-            { id: 2, title: "Ekseni", artist: "ATEE & BHUDDA V DIME", duration: "", cover: "/samples/covers/ekseni.jpg", color: "#00e5ff", src: "/samples/Ekseni(4).mp3" },
-            { id: 3, title: "Masambe", artist: "ATEE", duration: "", cover: "/samples/covers/masambe.jpg", color: "#a855f7", src: "/samples/Masambe(2).m4a" },
-            { id: 4, title: "Money Moves", artist: "NAZZ, ATEE, MAGESH", duration: "", cover: "/samples/covers/money-moves.jpg", color: "#ff007f", src: "/samples/Money Moves(3).m4a" }
+                                const PLAYLIST = [
+            { id: 1, title: "Don't Be Dumb", artist: "ATEE", duration: "", cover: "/samples/covers/dont-be-dumb.png", color: "#ffffff", src: "/samples/Don't Be Dumb.m4a" },
+            { id: 2, title: "Ekseni", artist: "ATEE & BHUDDA V DIME", duration: "", cover: "/samples/covers/ekseni.png", color: "#ffffff", src: "/samples/Ekseni(4).mp3" },
+            { id: 3, title: "Masambe", artist: "ATEE", duration: "", cover: "/samples/covers/masambe.png", color: "#ffffff", src: "/samples/Masambe(2).m4a" },
+            { id: 4, title: "Money Moves", artist: "NAZZ, ATEE, MAGESH", duration: "", cover: "/samples/covers/money-moves.png", color: "#ffffff", src: "/samples/Money Moves(3).m4a" }
         ];
         let currentTrackIndex = 0, isPlaying = false, audioCtx = null, analyser = null, sourceNode = null, vizMode = 0, synthOscillator = null, ambientActive = false;
         const loadingOverlay = document.getElementById('loading-overlay'), loaderProgressBar = document.getElementById('loader-progress-bar'), loaderPercentage = document.getElementById('loader-percentage'), loaderStatus = document.getElementById('loader-status'), enterBtn = document.getElementById('enter-btn'), appContainer = document.getElementById('app-container'), audioPlayer = document.getElementById('audio-player'), mainPlayBtn = document.getElementById('main-play-btn'), heroPlayBtn = document.getElementById('hero-play-btn'), heroActionPlay = document.getElementById('hero-action-play'), prevBtn = document.getElementById('prev-btn'), nextBtn = document.getElementById('next-btn'), seekBar = document.getElementById('seek-bar'), currentTimeEl = document.getElementById('current-time'), totalDurationEl = document.getElementById('total-duration'), volumeSlider = document.getElementById('volume-slider'), muteBtn = document.getElementById('mute-btn'), volumeIcon = document.getElementById('volume-icon'), mainAlbumArt = document.getElementById('main-album-art'), heroTrackTitle = document.getElementById('hero-track-title'), heroTrackArtist = document.getElementById('hero-track-artist'), playerThumb = document.getElementById('player-thumb'), playerTitle = document.getElementById('player-title'), playerArtist = document.getElementById('player-artist'), heroVinyl = document.getElementById('hero-vinyl'), loaderVinyl = document.getElementById('loader-vinyl'), canvas = document.getElementById('canvas-visualizer'), canvasCtx = canvas.getContext('2d'), ambientToggleBtn = document.getElementById('ambient-toggle-btn');
