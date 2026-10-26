@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AURA // Immersive Audio Portal</title>
+    <title>AKT MEDIA PRODUCTIONS // Immersive Audio Portal</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -50,21 +50,25 @@
         .loader-bar:nth-child(5) { animation-delay: 0.3s; }
         @keyframes equalizer { 0% { height: 12%; } 100% { height: 100%; } }
         .ambient-bg { position: fixed; width: 100vw; height: 100vh; top: 0; left: 0; z-index: 0; overflow: hidden; pointer-events: none; }
-        .glow-orb { position: absolute; border-radius: 50%; filter: blur(100px); opacity: 0.15; }
+        .glow-orb { position: absolute; border-radius: 50%; filter: blur(100px); opacity: 0.15; transition: all 1s ease; }
         .paused-spin { animation-play-state: paused !important; }
         input[type="range"] { -webkit-appearance: none; background: rgba(255, 255, 255, 0.1); border-radius: 9999px; height: 4px; }
-        input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; height: 12px; width: 12px; border-radius: 50%; background: #00ff88; cursor: pointer; box-shadow: 0 0 10px rgba(0, 255, 136, 0.8); }
+        input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; height: 12px; width: 12px; border-radius: 50%; background: #00ff88; cursor: pointer; box-shadow: 0 0 10px rgba(0, 255, 136, 0.8); transition: transform 0.1s; }
+        input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.3); }
     </style>
 </head>
 <body class="bg-darkBase text-slate-100 font-sans h-full overflow-hidden select-none">
-    <!-- Ambient Background -->
     <div class="ambient-bg">
         <div id="orb-1" class="glow-orb bg-neonGreen w-[500px] h-[500px] -top-32 -left-32"></div>
         <div id="orb-2" class="glow-orb bg-neonCyan w-[600px] h-[600px] -bottom-32 -right-32"></div>
         <div id="orb-3" class="glow-orb bg-neonPurple w-[400px] h-[400px] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"></div>
     </div>
-    <!-- Loading Overlay -->
+
     <div id="loading-overlay" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-darkBase/95 backdrop-blur-2xl transition-opacity duration-1000">
+        <button id="ambient-toggle-btn" class="absolute top-8 right-8 flex items-center gap-2 px-4 py-2 rounded-full glass-panel text-xs text-slate-400 hover:text-neonGreen transition-colors border border-slate-700/50">
+            <i class="fa-solid fa-volume-xmark" id="ambient-icon"></i>
+            <span id="ambient-text">Ambient Preview Off</span>
+        </button>
         <div class="relative flex flex-col items-center max-w-md w-full px-6">
             <div class="relative mb-10 flex items-center justify-center">
                 <div class="absolute w-48 h-48 rounded-full border border-neonGreen/20 animate-ping opacity-75"></div>
@@ -75,9 +79,7 @@
                     <div class="absolute inset-8 rounded-full border border-slate-800/80"></div>
                     <div class="absolute inset-11 rounded-full border border-slate-800/80"></div>
                     <div class="w-14 h-14 rounded-full bg-gradient-to-tr from-neonGreen to-neonCyan flex items-center justify-center p-0.5">
-                        <div class="w-full h-full rounded-full bg-slate-950 flex items-center justify-center">
-                            <div class="w-3 h-3 rounded-full bg-white"></div>
-                        </div>
+                        <div class="w-full h-full rounded-full bg-slate-950 flex items-center justify-center"><div class="w-3 h-3 rounded-full bg-white"></div></div>
                     </div>
                 </div>
                 <div class="absolute bottom-[-15px] flex items-end justify-center gap-1.5 h-10 px-4 py-1 rounded-full bg-slate-950/80 border border-slate-800">
@@ -88,7 +90,7 @@
                     <div class="loader-bar w-1 bg-neonCyan rounded-full"></div>
                 </div>
             </div>
-            <h1 class="text-3xl font-extrabold tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-neonGreen via-neonCyan to-white mb-2">AURA SOUNDS</h1>
+            <h1 class="text-3xl font-extrabold tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-neonGreen via-neonCyan to-white mb-2">AKT MEDIA PRODUCTIONS</h1>
             <p id="loader-status" class="text-xs uppercase tracking-widest text-slate-400 font-semibold mb-8">Synthesizing Audio Context...</p>
             <div class="w-full bg-slate-800/60 rounded-full h-2.5 mb-4 p-0.5 overflow-hidden border border-slate-700/50 shadow-inner">
                 <div id="loader-progress-bar" class="bg-gradient-to-r from-neonGreen to-neonCyan h-full rounded-full w-0 transition-all duration-300 shadow-[0_0_12px_rgba(0,255,136,0.8)]"></div>
@@ -102,65 +104,115 @@
             </button>
         </div>
     </div>
-    <!-- Main App -->
+
     <div id="app-container" class="relative z-10 flex flex-col h-screen opacity-0 transition-opacity duration-1000">
         <header class="glass-nav h-16 px-6 flex items-center justify-between shrink-0">
             <div class="flex items-center gap-3">
-                <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-neonGreen to-neonCyan flex items-center justify-center text-slate-950 font-black text-sm">A</div>
-                <span class="font-bold text-lg tracking-wider bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-400">AURA</span>
+                <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-neonGreen to-neonCyan flex items-center justify-center text-slate-950 font-black text-sm">AKT</div>
+                <span class="font-bold text-lg tracking-wider bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-400">AKT MEDIA PRODUCTIONS</span>
             </div>
             <div class="flex items-center gap-4">
-                <a href="/" class="text-xs text-slate-400 hover:text-neonGreen transition-colors">← Back to AKT Media</a>
+                <a href="/" class="text-xs text-slate-400 hover:text-neonGreen transition-colors">← Back to Main Site</a>
             </div>
         </header>
+
         <div class="flex flex-1 overflow-hidden">
             <aside class="w-20 lg:w-64 glass-panel border-r-0 border-y-0 flex flex-col justify-between py-6 px-4 shrink-0">
-                <nav class="space-y-2">
-                    <a href="#" class="flex items-center gap-4 px-3 py-3 rounded-xl bg-gradient-to-r from-neonGreen/10 to-transparent text-neonGreen font-semibold border-l-2 border-neonGreen">
-                        <i class="fa-solid fa-house text-lg w-6 text-center"></i><span class="hidden lg:inline text-sm">Discover</span>
-                    </a>
-                </nav>
+                <div class="space-y-6">
+                    <div class="px-2 text-slate-400 uppercase text-[10px] font-extrabold tracking-widest hidden lg:block">Menu</div>
+                    <nav class="space-y-2">
+                        <a href="#" class="flex items-center gap-4 px-3 py-3 rounded-xl bg-gradient-to-r from-neonGreen/10 to-transparent text-neonGreen font-semibold border-l-2 border-neonGreen">
+                            <i class="fa-solid fa-house text-lg w-6 text-center"></i><span class="hidden lg:inline text-sm">Discover</span>
+                        </a>
+                        <a href="#" class="flex items-center gap-4 px-3 py-3 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/30 transition-all">
+                            <i class="fa-solid fa-compass text-lg w-6 text-center"></i><span class="hidden lg:inline text-sm">Browse</span>
+                        </a>
+                        <a href="#" class="flex items-center gap-4 px-3 py-3 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/30 transition-all">
+                            <i class="fa-solid fa-radio text-lg w-6 text-center"></i><span class="hidden lg:inline text-sm">Radio</span>
+                        </a>
+                        <a href="#" class="flex items-center gap-4 px-3 py-3 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/30 transition-all">
+                            <i class="fa-solid fa-chart-line text-lg w-6 text-center"></i><span class="hidden lg:inline text-sm">Top Charts</span>
+                        </a>
+                    </nav>
+                    <div class="pt-4 px-2 text-slate-400 uppercase text-[10px] font-extrabold tracking-widest hidden lg:block">Library</div>
+                    <nav class="space-y-2">
+                        <a href="#" class="flex items-center gap-4 px-3 py-3 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/30 transition-all">
+                            <i class="fa-solid fa-heart text-lg w-6 text-center"></i><span class="hidden lg:inline text-sm">Favorites</span>
+                        </a>
+                        <a href="#" class="flex items-center gap-4 px-3 py-3 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/30 transition-all">
+                            <i class="fa-solid fa-list-ul text-lg w-6 text-center"></i><span class="hidden lg:inline text-sm">Playlists</span>
+                        </a>
+                        <a href="#" class="flex items-center gap-4 px-3 py-3 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/30 transition-all">
+                            <i class="fa-solid fa-clock-rotate-left text-lg w-6 text-center"></i><span class="hidden lg:inline text-sm">Recent</span>
+                        </a>
+                    </nav>
+                </div>
+                <div class="glass-panel p-3 rounded-xl border border-slate-800 hidden lg:block">
+                    <div class="flex items-center justify-between text-xs mb-2">
+                        <span class="text-slate-400">Visualizer Visual</span>
+                        <span id="viz-mode-name" class="text-neonCyan font-bold">Bars</span>
+                    </div>
+                    <button id="toggle-viz-mode" class="w-full py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs transition-colors">Change Render</button>
+                </div>
             </aside>
+
             <main class="flex-1 overflow-y-auto p-4 md:p-8 space-y-8">
                 <section class="relative rounded-3xl overflow-hidden glass-panel border border-slate-800/80 p-6 md:p-8 flex flex-col md:flex-row gap-8 items-center">
                     <canvas id="canvas-visualizer" class="absolute inset-0 w-full h-full pointer-events-none opacity-40 z-0"></canvas>
                     <div class="relative z-10 group shrink-0">
                         <div id="main-album-wrapper" class="relative w-48 h-48 md:w-56 md:h-56 rounded-2xl overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,0.8)] border border-slate-700/50">
-                            <img id="main-album-art" src="https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?w=500&auto=format&fit=crop&q=80" alt="Current Album Art" class="w-full h-full object-cover">
+                            <img id="main-album-art" src="https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?w=500&auto=format&fit=crop&q=80" alt="Current Album Art" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
+                            <div class="absolute inset-0 bg-slate-950/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                <button id="hero-play-btn" class="w-14 h-14 rounded-full bg-neonGreen text-slate-950 flex items-center justify-center shadow-lg hover:scale-110 transition-transform"><i class="fa-solid fa-play text-xl ml-1"></i></button>
+                            </div>
                         </div>
-                        <div id="hero-vinyl" class="absolute -right-8 top-1/2 -translate-y-1/2 w-44 h-44 rounded-full bg-slate-950 border-2 border-slate-800 -z-10 animate-spin-slow paused-spin hidden sm:block">
+                        <div id="hero-vinyl" class="absolute -right-8 top-1/2 -translate-y-1/2 w-44 h-44 rounded-full bg-slate-950 border-2 border-slate-800 -z-10 animate-spin-slow paused-spin hidden sm:block shadow-xl">
+                            <div class="absolute inset-2 rounded-full border border-slate-800/60"></div>
+                            <div class="absolute inset-6 rounded-full border border-slate-800/60"></div>
+                            <div class="absolute inset-10 rounded-full border border-slate-800/60"></div>
                             <div class="w-12 h-12 rounded-full bg-neonGreen/80 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 border-2 border-slate-900"></div>
                         </div>
                     </div>
                     <div class="relative z-10 flex-1 text-center md:text-left space-y-3">
+                        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-neonGreen/10 border border-neonGreen/30 text-neonGreen text-xs font-semibold">
+                            <i class="fa-solid fa-bolt"></i> NOW FEATURED
+                        </div>
                         <h2 id="hero-track-title" class="text-2xl md:text-4xl font-extrabold tracking-tight text-white">Cybernetic Horizon</h2>
                         <p id="hero-track-artist" class="text-slate-400 font-medium text-sm md:text-base">Neon Synth Orchestra</p>
-                        <button id="hero-action-play" class="px-6 py-3 rounded-full bg-gradient-to-r from-neonGreen to-neonCyan text-slate-950 font-bold text-xs uppercase tracking-wider shadow-[0_0_20px_rgba(0,255,136,0.3)]">
-                            <i class="fa-solid fa-play mr-2"></i> Play Track
-                        </button>
+                        <p class="text-xs text-slate-500 max-w-lg hidden md:block">Immerse yourself in high-frequency synth oscillations and analog basslines crafted for deep spatial audio visualization.</p>
+                        <div class="pt-2 flex flex-wrap items-center justify-center md:justify-start gap-4">
+                            <button id="hero-action-play" class="px-6 py-3 rounded-full bg-gradient-to-r from-neonGreen to-neonCyan text-slate-950 font-bold text-xs uppercase tracking-wider shadow-[0_0_20px_rgba(0,255,136,0.3)] hover:shadow-[0_0_30px_rgba(0,229,255,0.6)] hover:scale-105 transition-all"><i class="fa-solid fa-play mr-2"></i> Play Track</button>
+                            <button class="px-6 py-3 rounded-full glass-panel border border-slate-700 text-white font-bold text-xs uppercase tracking-wider hover:bg-slate-800 transition-all"><i class="fa-regular fa-heart mr-2"></i> Save Album</button>
+                        </div>
                     </div>
                 </section>
+
                 <section class="space-y-4">
                     <div class="flex items-center justify-between">
                         <h3 class="text-lg font-bold text-white tracking-wide">Featured Tracks</h3>
+                        <span class="text-xs text-slate-400">4 Tracks Available</span>
                     </div>
                     <div class="grid grid-cols-1 gap-2" id="playlist-container"></div>
                 </section>
             </main>
         </div>
+
         <footer class="glass-nav h-24 px-4 md:px-8 flex items-center justify-between shrink-0 z-20 border-t border-slate-800/80">
             <div class="flex items-center gap-4 w-1/4 min-w-[180px]">
-                <img id="player-thumb" src="https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?w=150&auto=format&fit=crop&q=80" class="w-14 h-14 rounded-xl object-cover border border-slate-800 shrink-0">
+                <img id="player-thumb" src="https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?w=150&auto=format&fit=crop&q=80" class="w-14 h-14 rounded-xl object-cover border border-slate-800 shadow-md shrink-0" alt="Current Track">
                 <div class="overflow-hidden">
                     <h4 id="player-title" class="text-sm font-bold text-white truncate">Cybernetic Horizon</h4>
                     <p id="player-artist" class="text-xs text-slate-400 truncate">Neon Synth Orchestra</p>
                 </div>
+                <button class="text-slate-500 hover:text-neonGreen transition-colors hidden sm:block"><i class="fa-regular fa-heart"></i></button>
             </div>
             <div class="flex flex-col items-center justify-center gap-2 w-2/4 max-w-xl">
                 <div class="flex items-center gap-6">
-                    <button id="prev-btn" class="text-slate-300 hover:text-white"><i class="fa-solid fa-backward-step"></i></button>
-                    <button id="main-play-btn" class="w-11 h-11 rounded-full bg-gradient-to-r from-neonGreen to-neonCyan text-slate-950 flex items-center justify-center"><i class="fa-solid fa-play ml-0.5"></i></button>
-                    <button id="next-btn" class="text-slate-300 hover:text-white"><i class="fa-solid fa-forward-step"></i></button>
+                    <button id="shuffle-btn" class="text-slate-500 hover:text-neonGreen transition-colors text-sm"><i class="fa-solid fa-shuffle"></i></button>
+                    <button id="prev-btn" class="text-slate-300 hover:text-white transition-colors text-lg"><i class="fa-solid fa-backward-step"></i></button>
+                    <button id="main-play-btn" class="w-11 h-11 rounded-full bg-gradient-to-r from-neonGreen to-neonCyan text-slate-950 flex items-center justify-center shadow-[0_0_15px_rgba(0,255,136,0.4)] hover:scale-105 transition-transform"><i class="fa-solid fa-play text-base ml-0.5"></i></button>
+                    <button id="next-btn" class="text-slate-300 hover:text-white transition-colors text-lg"><i class="fa-solid fa-forward-step"></i></button>
+                    <button id="repeat-btn" class="text-slate-500 hover:text-neonGreen transition-colors text-sm"><i class="fa-solid fa-repeat"></i></button>
                 </div>
                 <div class="flex items-center gap-3 w-full text-[11px] font-mono text-slate-400">
                     <span id="current-time">0:00</span>
@@ -169,12 +221,14 @@
                 </div>
             </div>
             <div class="flex items-center justify-end gap-3 w-1/4 min-w-[140px]">
-                <button id="mute-btn" class="text-slate-400"><i id="volume-icon" class="fa-solid fa-volume-high"></i></button>
+                <button id="mute-btn" class="text-slate-400 hover:text-neonGreen transition-colors text-sm"><i id="volume-icon" class="fa-solid fa-volume-high"></i></button>
                 <input id="volume-slider" type="range" min="0" max="1" step="0.01" value="0.7" class="w-20 hidden sm:block">
             </div>
         </footer>
     </div>
+
     <audio id="audio-player" crossorigin="anonymous"></audio>
+
     <script>
         const PLAYLIST = [
             { id: 1, title: "Cybernetic Horizon", artist: "Neon Synth Orchestra", duration: "2:45", cover: "https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?w=600&auto=format&fit=crop&q=80", color: "#00ff88", src: "https://cdn.pixabay.com/download/audio/2022/03/15/audio_c8c8a73467.mp3?filename=synthwave-80s-110045.mp3" },
@@ -182,29 +236,34 @@
             { id: 3, title: "Midnight Odyssey", artist: "Vector Void", duration: "2:30", cover: "https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?w=600&auto=format&fit=crop&q=80", color: "#a855f7", src: "https://cdn.pixabay.com/download/audio/2022/10/14/audio_9939f792cb.mp3?filename=cyberpunk-2099-10701.mp3" },
             { id: 4, title: "Solar Drift", artist: "Hyperion Waves", duration: "3:40", cover: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=600&auto=format&fit=crop&q=80", color: "#ff007f", src: "https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=retrowave-synthwave-112574.mp3" }
         ];
-        let currentTrackIndex=0,isPlaying=false,audioCtx=null,analyser=null,sourceNode=null,vizMode=0;
-        const loadingOverlay=document.getElementById('loading-overlay'),loaderProgressBar=document.getElementById('loader-progress-bar'),loaderPercentage=document.getElementById('loader-percentage'),loaderStatus=document.getElementById('loader-status'),enterBtn=document.getElementById('enter-btn'),appContainer=document.getElementById('app-container'),audioPlayer=document.getElementById('audio-player'),mainPlayBtn=document.getElementById('main-play-btn'),heroActionPlay=document.getElementById('hero-action-play'),prevBtn=document.getElementById('prev-btn'),nextBtn=document.getElementById('next-btn'),seekBar=document.getElementById('seek-bar'),currentTimeEl=document.getElementById('current-time'),totalDurationEl=document.getElementById('total-duration'),volumeSlider=document.getElementById('volume-slider'),muteBtn=document.getElementById('mute-btn'),volumeIcon=document.getElementById('volume-icon'),mainAlbumArt=document.getElementById('main-album-art'),heroTrackTitle=document.getElementById('hero-track-title'),heroTrackArtist=document.getElementById('hero-track-artist'),playerThumb=document.getElementById('player-thumb'),playerTitle=document.getElementById('player-title'),playerArtist=document.getElementById('player-artist'),heroVinyl=document.getElementById('hero-vinyl'),canvas=document.getElementById('canvas-visualizer'),canvasCtx=canvas.getContext('2d');
-        window.addEventListener('DOMContentLoaded',()=>{renderPlaylist();setupCanvasSize();runPreloader();});
-        window.addEventListener('resize',setupCanvasSize);
-        function runPreloader(){let p=0;const iv=setInterval(()=>{p+=Math.floor(Math.random()*10)+5;if(p>=100){p=100;clearInterval(iv);setTimeout(()=>{enterBtn.classList.remove('hidden');setTimeout(()=>enterBtn.classList.remove('opacity-0','translate-y-4'),50);},200);}loaderProgressBar.style.width=p+'%';loaderPercentage.textContent=p+'%';if(p<40)loaderStatus.textContent='Initializing Audio Engine...';else if(p<70)loaderStatus.textContent='Loading Tracks...';else loaderStatus.textContent='System Ready.';},80);}
-        enterBtn.addEventListener('click',()=>{initAudio();loadingOverlay.classList.add('opacity-0');setTimeout(()=>{loadingOverlay.classList.add('hidden');appContainer.classList.remove('opacity-0');loadTrack(0);},800);});
-        function initAudio(){if(!audioCtx){const AC=window.AudioContext||window.webkitAudioContext;audioCtx=new AC();analyser=audioCtx.createAnalyser();analyser.fftSize=128;sourceNode=audioCtx.createMediaElementSource(audioPlayer);sourceNode.connect(analyser);analyser.connect(audioCtx.destination);drawViz();}}
-        function setupCanvasSize(){const c=canvas.parentElement;canvas.width=c.clientWidth;canvas.height=c.clientHeight;}
-        function drawViz(){requestAnimationFrame(drawViz);if(!analyser)return;const buf=analyser.frequencyBinCount,data=new Uint8Array(buf);canvasCtx.clearRect(0,0,canvas.width,canvas.height);analyser.getByteFrequencyData(data);const w=(canvas.width/buf)*2.5;let x=0;for(let i=0;i<buf;i++){const h=(data[i]/255)*canvas.height*0.8;const g=canvasCtx.createLinearGradient(0,canvas.height,0,0);g.addColorStop(0,'rgba(9,10,15,0)');g.addColorStop(0.5,PLAYLIST[currentTrackIndex].color+'44');g.addColorStop(1,PLAYLIST[currentTrackIndex].color);canvasCtx.fillStyle=g;canvasCtx.fillRect(x,canvas.height-h,w-2,h);x+=w;}}
-        function renderPlaylist(){document.getElementById('playlist-container').innerHTML=PLAYLIST.map((t,i)=>`<div onclick="selectTrack(${i})" class="track-row glass-panel flex items-center justify-between p-3.5 rounded-2xl cursor-pointer hover:bg-slate-800/50 transition-all border border-slate-800/60 ${i===currentTrackIndex?'border-neonGreen/40 bg-slate-800/40':''}"><div class="flex items-center gap-4"><span class="text-xs font-mono w-4 text-center ${i===currentTrackIndex?'text-neonGreen':'text-slate-500'}">0${i+1}</span><img src="${t.cover}" class="w-10 h-10 rounded-xl object-cover"><div><h4 class="text-sm font-bold ${i===currentTrackIndex?'text-neonGreen':'text-white'}">${t.title}</h4><p class="text-xs text-slate-400">${t.artist}</p></div></div><span class="text-xs font-mono text-slate-500">${t.duration}</span></div>`).join('');}
-        function loadTrack(i){currentTrackIndex=i;const t=PLAYLIST[i];audioPlayer.src=t.src;mainAlbumArt.src=t.cover;playerThumb.src=t.cover;heroTrackTitle.textContent=t.title;heroTrackArtist.textContent=t.artist;playerTitle.textContent=t.title;playerArtist.textContent=t.artist;document.getElementById('orb-1').style.backgroundColor=t.color;renderPlaylist();}
-        function togglePlay(){if(audioCtx&&audioCtx.state==='suspended')audioCtx.resume();if(isPlaying){audioPlayer.pause();isPlaying=false;updateIcons(false);heroVinyl.classList.add('paused-spin');}else{audioPlayer.play().then(()=>{isPlaying=true;updateIcons(true);heroVinyl.classList.remove('paused-spin');});}renderPlaylist();}
-        function selectTrack(i){if(currentTrackIndex===i&&isPlaying)togglePlay();else{loadTrack(i);togglePlay();}}
-        function updateIcons(p){const ic=p?'fa-pause':'fa-play';mainPlayBtn.innerHTML=`<i class="fa-solid ${ic} ${p?'':'ml-0.5'}"></i>`;heroActionPlay.innerHTML=`<i class="fa-solid ${ic} mr-2"></i> ${p?'Pause Track':'Play Track'}`;}
-        mainPlayBtn.addEventListener('click',togglePlay);heroActionPlay.addEventListener('click',togglePlay);
-        prevBtn.addEventListener('click',()=>{currentTrackIndex=(currentTrackIndex-1+PLAYLIST.length)%PLAYLIST.length;loadTrack(currentTrackIndex);if(isPlaying)audioPlayer.play();});
-        nextBtn.addEventListener('click',()=>{currentTrackIndex=(currentTrackIndex+1)%PLAYLIST.length;loadTrack(currentTrackIndex);if(isPlaying)audioPlayer.play();});
-        audioPlayer.addEventListener('timeupdate',()=>{if(!isNaN(audioPlayer.duration)){seekBar.value=(audioPlayer.currentTime/audioPlayer.duration)*100;currentTimeEl.textContent=formatTime(audioPlayer.currentTime);totalDurationEl.textContent=formatTime(audioPlayer.duration);}});
-        seekBar.addEventListener('input',()=>{if(!isNaN(audioPlayer.duration))audioPlayer.currentTime=(seekBar.value/100)*audioPlayer.duration;});
-        volumeSlider.addEventListener('input',e=>{audioPlayer.volume=e.target.value;updateVol(e.target.value);});
-        muteBtn.addEventListener('click',()=>{if(audioPlayer.volume>0){audioPlayer.dataset.lv=audioPlayer.volume;audioPlayer.volume=0;volumeSlider.value=0;}else{const lv=audioPlayer.dataset.lv||0.7;audioPlayer.volume=lv;volumeSlider.value=lv;}updateVol(audioPlayer.volume);});
-        function updateVol(v){if(v==0)volumeIcon.className='fa-solid fa-volume-xmark';else if(v<0.5)volumeIcon.className='fa-solid fa-volume-low';else volumeIcon.className='fa-solid fa-volume-high';}
-        function formatTime(s){const m=Math.floor(s/60),sec=Math.floor(s%60);return m+':'+(sec<10?'0':'')+sec;}
+        let currentTrackIndex = 0, isPlaying = false, audioCtx = null, analyser = null, sourceNode = null, vizMode = 0, synthOscillator = null, ambientActive = false;
+        const loadingOverlay = document.getElementById('loading-overlay'), loaderProgressBar = document.getElementById('loader-progress-bar'), loaderPercentage = document.getElementById('loader-percentage'), loaderStatus = document.getElementById('loader-status'), enterBtn = document.getElementById('enter-btn'), appContainer = document.getElementById('app-container'), audioPlayer = document.getElementById('audio-player'), mainPlayBtn = document.getElementById('main-play-btn'), heroPlayBtn = document.getElementById('hero-play-btn'), heroActionPlay = document.getElementById('hero-action-play'), prevBtn = document.getElementById('prev-btn'), nextBtn = document.getElementById('next-btn'), seekBar = document.getElementById('seek-bar'), currentTimeEl = document.getElementById('current-time'), totalDurationEl = document.getElementById('total-duration'), volumeSlider = document.getElementById('volume-slider'), muteBtn = document.getElementById('mute-btn'), volumeIcon = document.getElementById('volume-icon'), mainAlbumArt = document.getElementById('main-album-art'), heroTrackTitle = document.getElementById('hero-track-title'), heroTrackArtist = document.getElementById('hero-track-artist'), playerThumb = document.getElementById('player-thumb'), playerTitle = document.getElementById('player-title'), playerArtist = document.getElementById('player-artist'), heroVinyl = document.getElementById('hero-vinyl'), loaderVinyl = document.getElementById('loader-vinyl'), canvas = document.getElementById('canvas-visualizer'), canvasCtx = canvas.getContext('2d'), ambientToggleBtn = document.getElementById('ambient-toggle-btn');
+        window.addEventListener('DOMContentLoaded', ()=>{ renderPlaylist(); setupCanvasSize(); runPreloaderSimulation(); });
+        window.addEventListener('resize', setupCanvasSize);
+        function runPreloaderSimulation(){ let p=0; const statuses=["Initializing Audio Engine...","Decoding Frequency Buffers...","Preloading Soundwaves...","Building Visualizer Canvas...","System Ready."]; const iv=setInterval(()=>{ p+=Math.floor(Math.random()*8)+4; if(p>=100){p=100;clearInterval(iv);onLoadingComplete();} loaderProgressBar.style.width=p+'%'; loaderPercentage.textContent=p+'%'; const si=Math.min(Math.floor(p/100*statuses.length),statuses.length-1); loaderStatus.textContent=statuses[si]; },90); }
+        function onLoadingComplete(){ enterBtn.classList.remove('hidden'); setTimeout(()=>enterBtn.classList.remove('opacity-0','translate-y-4'),50); }
+        ambientToggleBtn.addEventListener('click',()=>{ ambientActive=!ambientActive; const icon=document.getElementById('ambient-icon'); const text=document.getElementById('ambient-text'); if(ambientActive){ icon.className='fa-solid fa-volume-high text-neonGreen'; text.textContent='Ambient Preview On'; startAmbientPreview(); } else { icon.className='fa-solid fa-volume-xmark'; text.textContent='Ambient Preview Off'; stopAmbientPreview(); } });
+        function startAmbientPreview(){ try { const ctx=new (window.AudioContext||window.webkitAudioContext)(); const osc=ctx.createOscillator(); const gain=ctx.createGain(); osc.type='sine'; osc.frequency.setValueAtTime(110,ctx.currentTime); gain.gain.setValueAtTime(0.01,ctx.currentTime); gain.gain.exponentialRampToValueAtTime(0.08,ctx.currentTime+2); osc.connect(gain); gain.connect(ctx.destination); osc.start(); synthOscillator={ctx,osc,gain}; } catch(e){} }
+        function stopAmbientPreview(){ if(synthOscillator){ try { synthOscillator.gain.gain.exponentialRampToValueAtTime(0.001,synthOscillator.ctx.currentTime+0.5); setTimeout(()=>{try{synthOscillator.osc.stop();synthOscillator.ctx.close();}catch(e){} synthOscillator=null;},500); } catch(e){} } }
+        enterBtn.addEventListener('click',()=>{ initAudioContext(); stopAmbientPreview(); loadingOverlay.classList.add('opacity-0'); setTimeout(()=>{ loadingOverlay.classList.add('hidden'); appContainer.classList.remove('opacity-0'); loadTrack(0); },1000); });
+        function initAudioContext(){ if(!audioCtx){ const AC=window.AudioContext||window.webkitAudioContext; audioCtx=new AC(); analyser=audioCtx.createAnalyser(); analyser.fftSize=128; sourceNode=audioCtx.createMediaElementSource(audioPlayer); sourceNode.connect(analyser); analyser.connect(audioCtx.destination); drawVisualizer(); } }
+        function setupCanvasSize(){ const c=canvas.parentElement; canvas.width=c.clientWidth; canvas.height=c.clientHeight; }
+        function drawVisualizer(){ requestAnimationFrame(drawVisualizer); if(!analyser)return; const buf=analyser.frequencyBinCount, data=new Uint8Array(buf); canvasCtx.clearRect(0,0,canvas.width,canvas.height); const activeColor=PLAYLIST[currentTrackIndex].color||"#00ff88"; if(vizMode===0){ analyser.getByteFrequencyData(data); const bw=(canvas.width/buf)*2.5; let x=0; for(let i=0;i<buf;i++){ const bh=(data[i]/255)*canvas.height*0.8; const g=canvasCtx.createLinearGradient(0,canvas.height,0,0); g.addColorStop(0,'rgba(9,10,15,0)'); g.addColorStop(0.5,activeColor+'44'); g.addColorStop(1,activeColor); canvasCtx.fillStyle=g; canvasCtx.fillRect(x,canvas.height-bh,bw-2,bh); x+=bw; } } else { analyser.getByteTimeDomainData(data); canvasCtx.lineWidth=2; canvasCtx.strokeStyle=activeColor; canvasCtx.beginPath(); const sw=canvas.width/buf; let x=0; for(let i=0;i<buf;i++){ const v=data[i]/128.0, y=v*canvas.height/2; if(i===0)canvasCtx.moveTo(x,y); else canvasCtx.lineTo(x,y); x+=sw; } canvasCtx.lineTo(canvas.width,canvas.height/2); canvasCtx.stroke(); } }
+        document.getElementById('toggle-viz-mode').addEventListener('click',()=>{ vizMode=vizMode===0?1:0; document.getElementById('viz-mode-name').textContent=vizMode===0?'Bars':'Wave'; });
+        function renderPlaylist(){ document.getElementById('playlist-container').innerHTML=PLAYLIST.map((t,i)=>`<div onclick="selectTrack(${i})" class="track-row glass-panel flex items-center justify-between p-3.5 rounded-2xl cursor-pointer hover:bg-slate-800/50 transition-all border border-slate-800/60 ${i===currentTrackIndex?'border-neonGreen/40 bg-slate-800/40':''}"><div class="flex items-center gap-4"><span class="text-xs font-mono font-bold w-4 text-center ${i===currentTrackIndex?'text-neonGreen':'text-slate-500'}">0${i+1}</span><img src="${t.cover}" class="w-10 h-10 rounded-xl object-cover"><div><h4 class="text-sm font-bold ${i===currentTrackIndex?'text-neonGreen':'text-white'}">${t.title}</h4><p class="text-xs text-slate-400">${t.artist}</p></div></div><div class="flex items-center gap-4"><span class="text-xs font-mono text-slate-500">${t.duration}</span><button class="w-8 h-8 rounded-full flex items-center justify-center text-slate-400 hover:text-white"><i class="fa-solid ${i===currentTrackIndex&&isPlaying?'fa-pause text-neonGreen':'fa-play'} text-xs"></i></button></div></div>`).join(''); }
+        function loadTrack(i){ currentTrackIndex=i; const t=PLAYLIST[i]; audioPlayer.src=t.src; mainAlbumArt.src=t.cover; playerThumb.src=t.cover; heroTrackTitle.textContent=t.title; heroTrackArtist.textContent=t.artist; playerTitle.textContent=t.title; playerArtist.textContent=t.artist; document.getElementById('orb-1').style.backgroundColor=t.color; renderPlaylist(); }
+        function togglePlay(){ if(audioCtx&&audioCtx.state==='suspended')audioCtx.resume(); if(isPlaying){ audioPlayer.pause(); isPlaying=false; updatePlayIcons(false); heroVinyl.classList.add('paused-spin'); } else { audioPlayer.play().then(()=>{ isPlaying=true; updatePlayIcons(true); heroVinyl.classList.remove('paused-spin'); }); } renderPlaylist(); }
+        function selectTrack(i){ if(currentTrackIndex===i&&isPlaying) togglePlay(); else { loadTrack(i); togglePlay(); } }
+        function updatePlayIcons(p){ const ic=p?'fa-pause':'fa-play'; mainPlayBtn.innerHTML=`<i class="fa-solid ${ic} text-base ${p?'':'ml-0.5'}"></i>`; heroPlayBtn.innerHTML=`<i class="fa-solid ${ic} text-xl ${p?'':'ml-1'}"></i>`; heroActionPlay.innerHTML=`<i class="fa-solid ${ic} mr-2"></i> ${p?'Pause Track':'Play Track'}`; }
+        mainPlayBtn.addEventListener('click',togglePlay); heroPlayBtn.addEventListener('click',togglePlay); heroActionPlay.addEventListener('click',togglePlay);
+        prevBtn.addEventListener('click',()=>{ currentTrackIndex=(currentTrackIndex-1+PLAYLIST.length)%PLAYLIST.length; loadTrack(currentTrackIndex); if(isPlaying)audioPlayer.play(); });
+        nextBtn.addEventListener('click',()=>{ currentTrackIndex=(currentTrackIndex+1)%PLAYLIST.length; loadTrack(currentTrackIndex); if(isPlaying)audioPlayer.play(); });
+        audioPlayer.addEventListener('timeupdate',()=>{ if(!isNaN(audioPlayer.duration)){ const progress=(audioPlayer.currentTime/audioPlayer.duration)*100; seekBar.value=progress; currentTimeEl.textContent=formatTime(audioPlayer.currentTime); totalDurationEl.textContent=formatTime(audioPlayer.duration); } });
+        seekBar.addEventListener('input',()=>{ if(!isNaN(audioPlayer.duration)) audioPlayer.currentTime=(seekBar.value/100)*audioPlayer.duration; });
+        volumeSlider.addEventListener('input',e=>{ audioPlayer.volume=e.target.value; updateVolumeIcon(e.target.value); });
+        muteBtn.addEventListener('click',()=>{ if(audioPlayer.volume>0){ audioPlayer.dataset.lastVol=audioPlayer.volume; audioPlayer.volume=0; volumeSlider.value=0; } else { const lv=audioPlayer.dataset.lastVol||0.7; audioPlayer.volume=lv; volumeSlider.value=lv; } updateVolumeIcon(audioPlayer.volume); });
+        function updateVolumeIcon(vol){ if(vol==0) volumeIcon.className='fa-solid fa-volume-xmark text-slate-500'; else if(vol<0.5) volumeIcon.className='fa-solid fa-volume-low text-neonGreen'; else volumeIcon.className='fa-solid fa-volume-high text-neonGreen'; }
+        function formatTime(s){ const m=Math.floor(s/60), sec=Math.floor(s%60); return m+':'+(sec<10?'0':'')+sec; }
         audioPlayer.addEventListener('ended',()=>nextBtn.click());
     </script>
 </body>
